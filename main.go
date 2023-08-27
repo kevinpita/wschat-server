@@ -36,24 +36,26 @@ func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 }
 
 func readMessage(ws *websocket.Conn, quit chan<- struct{}) {
-	msgType, msgData, err := ws.ReadMessage()
-	if err != nil {
-		if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-			log.Println("connection has been closed by the client")
-		} else {
-			log.Println("error reading next message:", err)
+	for {
+		msgType, msgData, err := ws.ReadMessage()
+		if err != nil {
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+				log.Println("connection has been closed by the client")
+			} else {
+				log.Println("error reading next message:", err)
+			}
+			close(quit)
+			return
 		}
-		close(quit)
-		return
-	}
 
-	if msgType == websocket.CloseMessage {
-		log.Println("received close message, terminating connection")
-		close(quit)
-		return
-	}
+		if msgType == websocket.CloseMessage {
+			log.Println("received close message, terminating connection")
+			close(quit)
+			return
+		}
 
-	log.Println("received data:", msgData)
+		log.Println("received data:", msgData)
+	}
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
