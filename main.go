@@ -47,7 +47,7 @@ func readMessage(ws *websocket.Conn, quit chan struct{}) {
 			log.Println("received stop signal, stopping read")
 			return
 		case <-ticker.C:
-			msgType, _, err := ws.NextReader()
+			msgType, msgData, err := ws.ReadMessage()
 			if err != nil {
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 					log.Println("received close message, terminating connection")
@@ -64,6 +64,8 @@ func readMessage(ws *websocket.Conn, quit chan struct{}) {
 				close(quit)
 				return
 			}
+
+			log.Println("received data:", msgData)
 		}
 	}
 }
