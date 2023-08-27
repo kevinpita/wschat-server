@@ -35,38 +35,25 @@ func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 	}
 }
 
-func readMessage(ws *websocket.Conn, quit chan struct{}) {
-	const tickerTime = 30 * time.Millisecond
-	ticker := time.NewTicker(tickerTime)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-quit:
-			log.Println("received stop signal, stopping read")
-			return
-		case <-ticker.C:
-			msgType, msgData, err := ws.ReadMessage()
-			if err != nil {
-				if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-					log.Println("received close message, terminating connection")
-					close(quit)
-					return
-				}
-				log.Println("error reading next message:", err)
-				close(quit)
-				return
-			}
-
-			if msgType == websocket.CloseMessage {
-				log.Println("received close message, terminating connection")
-				close(quit)
-				return
-			}
-
-			log.Println("received data:", msgData)
+func readMessage(ws *websocket.Conn, quit chan<- struct{}) {
+	msgType, msgData, err := ws.ReadMessage()
+	if err != nil {
+		if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+			log.Println("connection has been closed by the client")
+		} else {
+			log.Println("error reading next message:", err)
 		}
+		close(quit)
+		return
 	}
+
+	if msgType == websocket.CloseMessage {
+		log.Println("received close message, terminating connection")
+		close(quit)
+		return
+	}
+
+	log.Println("received data:", msgData)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
