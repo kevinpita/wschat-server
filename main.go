@@ -82,7 +82,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	go readMessage(conn, quit)
 
 	<-quit
-	log.Println("closing connection:", r.RemoteAddr)
+	log.Println("connection closed:", r.RemoteAddr)
 }
 
 func main() {
