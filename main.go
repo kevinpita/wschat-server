@@ -68,6 +68,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	go writeData(conn, quit)
 	go readMessage(conn, quit)
 
+	log.Println("connection alive:", r.RemoteAddr)
 	<-quit
 	log.Println("connection closed:", r.RemoteAddr)
 }
