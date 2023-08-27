@@ -15,8 +15,8 @@ type Message struct {
 func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 	data := Message{}
 
-	const tickerMilliseconds = 30
-	ticker := time.NewTicker(tickerMilliseconds * time.Millisecond)
+	const tickerTime = 30 + time.Millisecond
+	ticker := time.NewTicker(tickerTime)
 	defer ticker.Stop()
 
 	for {
@@ -37,8 +37,8 @@ func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 }
 
 func readMessage(ws *websocket.Conn, quit chan struct{}) {
-	const tickerMilliseconds = 30
-	ticker := time.NewTicker(tickerMilliseconds * time.Millisecond)
+	const tickerTime = 30 + time.Millisecond
+	ticker := time.NewTicker(tickerTime)
 	defer ticker.Stop()
 
 	for {
@@ -88,16 +88,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	const (
-		readSeconds  = 5
-		writeSeconds = 10
-		idleSeconds  = 15
+		readTime  = 5 * time.Second
+		writeTime = 10 * time.Second
+		idleTime  = 15 * time.Second
 	)
 	http.HandleFunc("/", handler)
 	srv := &http.Server{
 		Addr:         ":8080",
-		ReadTimeout:  readSeconds * time.Second,
-		WriteTimeout: writeSeconds * time.Second,
-		IdleTimeout:  idleSeconds * time.Second,
+		ReadTimeout:  readTime,
+		WriteTimeout: writeTime,
+		IdleTimeout:  idleTime,
 	}
 
 	err := srv.ListenAndServe()
