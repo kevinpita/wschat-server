@@ -13,7 +13,7 @@ type Message struct {
 }
 
 func writeData(ws *websocket.Conn, quit <-chan struct{}) {
-	data := Message{}
+	msg := Message{}
 
 	const tickerTime = 30 * time.Millisecond
 	ticker := time.NewTicker(tickerTime)
@@ -25,12 +25,12 @@ func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 			log.Println("received stop signal, stopping write")
 			return
 		case <-ticker.C:
-			err := ws.WriteJSON(data)
+			err := ws.WriteJSON(msg)
 			if err != nil {
 				log.Println("error writing message:", err)
 				return
 			}
-			data.Data++
+			msg.Data++
 		}
 	}
 }
