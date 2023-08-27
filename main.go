@@ -24,7 +24,7 @@ func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 		default:
 			err := ws.WriteJSON(data)
 			if err != nil {
-				log.Println("Error writing message:", err)
+				log.Println("error writing message:", err)
 				break
 			}
 			data.Data++
@@ -41,7 +41,7 @@ func readMessage(ws *websocket.Conn, quit chan struct{}) {
 		default:
 			msgType, _, err := ws.NextReader()
 			if err != nil {
-				log.Println("Error reading next message:", err)
+				log.Println("error reading next message:", err)
 				close(quit)
 				break
 			}
