@@ -14,12 +14,17 @@ type Message struct {
 
 func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 	data := Message{}
+
+	const tickerMilliseconds = 30
+	ticker := time.NewTicker(tickerMilliseconds * time.Millisecond)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-quit:
 			log.Println("received stop signal, stopping write")
 			return
-		default:
+		case <-ticker.C:
 			err := ws.WriteJSON(data)
 			if err != nil {
 				log.Println("error writing message:", err)
@@ -32,12 +37,16 @@ func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 }
 
 func readMessage(ws *websocket.Conn, quit chan struct{}) {
+	const tickerMilliseconds = 30
+	ticker := time.NewTicker(tickerMilliseconds * time.Millisecond)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-quit:
 			log.Println("received stop signal, stopping read")
 			return
-		default:
+		case <-ticker.C:
 			msgType, _, err := ws.NextReader()
 			if err != nil {
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
