@@ -15,7 +15,7 @@ type Message struct {
 func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 	data := Message{}
 
-	const tickerTime = 30 + time.Millisecond
+	const tickerTime = 30 * time.Millisecond
 	ticker := time.NewTicker(tickerTime)
 	defer ticker.Stop()
 
@@ -31,13 +31,12 @@ func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 				return
 			}
 			data.Data++
-			time.Sleep(time.Millisecond)
 		}
 	}
 }
 
 func readMessage(ws *websocket.Conn, quit chan struct{}) {
-	const tickerTime = 30 + time.Millisecond
+	const tickerTime = 30 * time.Millisecond
 	ticker := time.NewTicker(tickerTime)
 	defer ticker.Stop()
 
