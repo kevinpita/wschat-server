@@ -14,17 +14,16 @@ type Message struct {
 
 func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 	data := Message{}
-loopRead:
 	for {
 		select {
 		case <-quit:
 			log.Println("received stop signal, stopping write")
-			break loopRead
+			return
 		default:
 			err := ws.WriteJSON(data)
 			if err != nil {
 				log.Println("error writing message:", err)
-				break loopRead
+				return
 			}
 			data.Data++
 			time.Sleep(time.Millisecond)
@@ -33,29 +32,28 @@ loopRead:
 }
 
 func readMessage(ws *websocket.Conn, quit chan struct{}) {
-loopRead:
 	for {
 		select {
 		case <-quit:
 			log.Println("received stop signal, stopping read")
-			break loopRead
+			return
 		default:
 			msgType, _, err := ws.NextReader()
 			if err != nil {
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 					log.Println("received close message, terminating connection")
 					close(quit)
-					break loopRead
+					return
 				}
 				log.Println("error reading next message:", err)
 				close(quit)
-				break loopRead
+				return
 			}
 
 			if msgType == websocket.CloseMessage {
 				log.Println("received close message, terminating connection")
 				close(quit)
-				break loopRead
+				return
 			}
 		}
 	}
