@@ -80,17 +80,19 @@ func (s *server) handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	const (
-		readTime  = 5 * time.Second
-		writeTime = 10 * time.Second
-		idleTime  = 15 * time.Second
+		readTime       = 5 * time.Second
+		readHeaderTime = time.Second
+		writeTime      = 10 * time.Second
+		idleTime       = 15 * time.Second
 	)
 	server := &server{upgrader: websocket.Upgrader{}}
 	http.HandleFunc("/", server.handler)
 	srv := &http.Server{
-		Addr:         ":8080",
-		ReadTimeout:  readTime,
-		WriteTimeout: writeTime,
-		IdleTimeout:  idleTime,
+		Addr:              ":8080",
+		ReadTimeout:       readTime,
+		ReadHeaderTimeout: readHeaderTime,
+		WriteTimeout:      writeTime,
+		IdleTimeout:       idleTime,
 	}
 
 	err := srv.ListenAndServe()
