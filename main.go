@@ -12,6 +12,10 @@ type Message struct {
 	Data int `json:"data"`
 }
 
+type server struct {
+	upgrader websocket.Upgrader
+}
+
 func writeData(ws *websocket.Conn, quit <-chan struct{}) {
 	msg := Message{}
 
@@ -58,9 +62,8 @@ func readMessage(ws *websocket.Conn, quit chan<- struct{}) {
 	}
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	upgrader := websocket.Upgrader{}
-	conn, err := upgrader.Upgrade(w, r, nil)
+func (s *server) handler(w http.ResponseWriter, r *http.Request) {
+	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
@@ -81,7 +84,8 @@ func main() {
 		writeTime = 10 * time.Second
 		idleTime  = 15 * time.Second
 	)
-	http.HandleFunc("/", handler)
+	server := &server{upgrader: websocket.Upgrader{}}
+	http.HandleFunc("/", server.handler)
 	srv := &http.Server{
 		Addr:         ":8080",
 		ReadTimeout:  readTime,
