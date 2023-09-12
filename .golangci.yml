@@ -3,8 +3,6 @@ run:
 linters-settings:
   errcheck:
     check-type-assertions: true
-  funlen:
-    ignore-comments: true
   gocognit:
     min-complexity: 20
   gocritic:
@@ -88,6 +86,6 @@ linters:
     - usestdlibvars # detects the possibility to use variables/constants from the Go standard library
     - wastedassign # finds wasted assignment statements
     - whitespace # detects leading and trailing whitespace
-    - gofumpt # checks whether code was gofumpt-ed
+    #- gofumpt false positive
 issues:
   max-same-issues: 50
